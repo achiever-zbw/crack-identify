@@ -135,7 +135,7 @@ optimizer = optim.Adam(list(con_layers.parameters())+list(fc_layers.parameters()
 
 
 #训练模型
-num_epochs = 10
+num_epochs = 15
 for each in range(num_epochs):
     running_loss = 0.0
     correct = 0.0
