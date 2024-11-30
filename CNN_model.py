@@ -51,7 +51,7 @@ for non_crack_image_name in non_crack_image:
 
 """
 
-data_path='./train_images'
+data_path='./crack-identify/train_images'
 
 #数据预处理 
 transform=transforms.Compose([

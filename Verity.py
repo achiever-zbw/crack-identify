@@ -23,8 +23,8 @@ transform=transforms.Compose([
     ])
 
 #加载验证集
-verity_path='./verity_images'
-verity_images_path=[os.path.join(verity_path, f) for f in os.listdir(verity_path)]  
+verify_path='./crack-identify/verify_images'
+verify_images_path=[os.path.join(verify_path, f) for f in os.listdir(verify_path)]  
 #os.listdir(n) 把n里的文件名称提取出来并存到一个列表
 #os.path.join(a,b)：把a和b的路径合到一起 ,比如'./verity_images/name1.jpg'，方便对每张图片的操作
 
@@ -36,10 +36,10 @@ fc_layers.load_state_dict(model["fc_layers"])
 con_layers.eval()
 fc_layers.eval()
 
-final_path='./final'
+final_path='./crack-identify/final'
 
 predictions=[]
-for img_path in verity_images_path:
+for img_path in verify_images_path:
         # 使用cv2读取图片
         img = cv2.imread(img_path)
         img_pic = Image.fromarray(img)   #保留picture形式，方便之后添加文字用
