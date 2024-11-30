@@ -14,8 +14,20 @@ from torchvision.models import resnet18
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
+from Denoising import medianblur #调用去噪库中的中值滤波函数
 
+#待去噪的图片路径
+non_denoising_crack_path='./crack-identify/train_images/crack'
+non_denoising_noncrack_path='./crack-identify/train_images/non_crack'
 
+#去噪后的图片路径
+denoising_crack_path='./crack-identify/Denoising_train_images/crack'
+denoising_noncrack_path='./crack-identify/Denoising_train_images/non_crack'
+
+#中值滤波器窗口大小，必须是奇数
+kernal_size=5
+medianblur(non_denoising_noncrack_path,denoising_noncrack_path,kernal_size)
+medianblur(non_denoising_crack_path,denoising_crack_path,kernal_size)
 """
 crack_path='./dataset/crack.txt'
 with open(crack_path,'r') as f:
@@ -51,7 +63,7 @@ for non_crack_image_name in non_crack_image:
 
 """
 
-data_path='./crack-identify/train_images'
+data_path='./crack-identify/Denoising_train_images'
 
 #数据预处理 
 transform=transforms.Compose([
