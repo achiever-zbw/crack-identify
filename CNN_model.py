@@ -82,7 +82,7 @@ sum_classes=len(classes)
 #print(f"类别：{classes}")
 
 #构建CNN模型
-"""
+
 class CNN(nn.Module):
     def __init__(self, num_classes):
         super(CNN, self).__init__()
@@ -94,7 +94,7 @@ class CNN(nn.Module):
             #池化操作(最大池化)
             nn.MaxPool2d(kernel_size=2, stride=2),                 # 尺寸减半：256*256 到 128*128（通过2*2的池化窗口实现）
             nn.Conv2d(32,32, kernel_size=3, stride=1, padding=1), # 输入通道=32保持不变
-            #nn.Conv2d(32,64, kernel_size=3, stride=1, padding=1)  #32->64
+            #nn.Conv2d(32,64, kernel_size=3, stride=1, padding=1)  #32到64
             nn.ReLU(),                                             # 激活函数
             nn.MaxPool2d(kernel_size=2, stride=2),                 # 尺寸减半：128*128 到 64*64
         )
@@ -112,9 +112,10 @@ class CNN(nn.Module):
         return x
     
 num_classes = len(classes)
-model = CNN(num_classes=num_classes)
-"""
+model = CNN(num_classes=num_classes)  
+
 #构建CNN模型
+"""
 #卷积层
 con_layers=nn.Sequential(
     nn.Conv2d(3, 32, kernel_size=3, stride=1, padding=1), 
@@ -141,15 +142,16 @@ def spread(i):
     i=con_layers(i)
     i=fc_layers(i)
     return i
-
+"""
 # 定义损失函数和优化器
 loss = nn.CrossEntropyLoss()  # 损失函数
-optimizer = optim.Adam(list(con_layers.parameters())+list(fc_layers.parameters()), lr=0.001)
+optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 
 #训练模型
-num_epochs = 15
+num_epochs =15
 for each in range(num_epochs):
+    model.train()  # 设置模型为训练模式
     running_loss = 0.0
     correct = 0.0
     total = 0.0
@@ -161,7 +163,7 @@ for each in range(num_epochs):
         
         
         optimizer.zero_grad()  # 梯度清零, 每次训练前防止梯度叠加
-        outputs = spread(inputs)  # 向前传播
+        outputs = model(inputs)  # 向前传播
         loss_data = loss(outputs, labels)  # 计算损失
         
         loss_data.backward()  # 反向传播
@@ -181,13 +183,8 @@ for each in range(num_epochs):
     print(f'Epoch [{each+1}/{num_epochs}], Loss: {each_loss:.2f}, Accuracy: {each_acc:.2f}%')
 
 # 保存模型
-torch.save({
-    'con_layers': con_layers.state_dict(),
-    'fc_layers': fc_layers.state_dict()
-}, "cnn_model.pth")
-print("模型已保存为 cnn_model.pth")
-
-
+torch.save(model, 'cnn_model.pkl') #修改pth格式为pkl
+print("模型已保存")
 
 
 

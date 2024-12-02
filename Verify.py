@@ -1,78 +1,97 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Nov 24 17:43:04 2024
-
-@author: 赵博文
-"""
-import cv2
 import os
 import torch
-from torch import nn, optim
 from torch.utils.data import DataLoader
-from torchvision import datasets, transforms
+from torchvision import transforms
 from PIL import Image, ImageDraw, ImageFont
+import cv2
+from Denoising import medianblur  # 调用去噪库中的中值滤波函数
+from CNN_model import CNN
+
+import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader
-from CNN_model import con_layers,fc_layers,spread
-from Denoising import medianblur #调用去噪库中的中值滤波函数
 
-#对验证集图片进行去噪
-verify_images_path='./crack-identify/verify_images'
-denoising_verify_images_path='./crack-identify/Denoising_verify_images'
-kernel_size=5
-medianblur(verify_images_path,denoising_verify_images_path,kernel_size)
+# 定义计算损失和返回输出的函数（只需要返回输出，不需要计算损失）
+def model_out_loss(input_data, model):
+    """
+    计算模型输出，返回模型的预测结果
+    
+    参数:
+    input_data (tensor): 输入的图像数据
+    model (nn.Module): 训练好的模型
+    
+    返回:
+    output (tensor): 模型的输出
+    """
+    model.eval()  # 设置模型为评估模式
+    with torch.no_grad():  # 禁用梯度计算
+        output = model(input_data)  # 获取模型的输出
+    return output
 
-#数据预处理
-transform=transforms.Compose([
+def model_test(model, test_data):
+    """
+    使用训练好的模型进行预测
+    """
+    model.eval()  # 设置模型为评估模式
+    with torch.no_grad():  # 在推理过程中不计算梯度
+        output = model_out_loss(test_data, model)  # 获取模型输出
+    return output
+
+# 定义路径
+verify_images_path = './crack-identify/verify_images'
+denoising_verify_images_path = './crack-identify/Denoising_verify_images'
+final_path = './crack-identify/final'
+kernel_size = 5  # 中值滤波器窗口大小
+
+# 去噪验证集图片
+medianblur(verify_images_path, denoising_verify_images_path, kernel_size)
+
+# 数据预处理（和训练集一样）
+transform = transforms.Compose([
     transforms.Resize([256, 256]),  # 与训练集图片大小一致
-    transforms.ToTensor(),    
+    transforms.ToTensor(),
     transforms.Normalize([0.5], [0.5])  # 标准化
-    ])
+])
 
-#加载验证集
-new_verify_images_path=[os.path.join(denoising_verify_images_path, f) for f in os.listdir(denoising_verify_images_path)]  
-#os.listdir(n) 把n里的文件名称提取出来并存到一个列表
-#os.path.join(a,b)：把a和b的路径合到一起 ,比如'./verity_images/name1.jpg'，方便对每张图片的操作
+# 加载验证集图片路径
+new_verify_images_path = [os.path.join(denoising_verify_images_path, f) for f in os.listdir(denoising_verify_images_path)]
 
-model=torch.load("cnn_model.pth")
+# 加载模型
+model = torch.load("cnn_model.pkl")  # 加载完整的模型（包括结构和权重）
+model.eval()  # 设置模型为评估模式
 
-con_layers.load_state_dict(model["con_layers"])
-fc_layers.load_state_dict(model["fc_layers"])
+# 确保保存结果的文件夹存在
+os.makedirs(final_path, exist_ok=True)
 
-con_layers.eval()
-fc_layers.eval()
-
-final_path='./crack-identify/final'
-
-predictions=[]
+# 预测和保存结果
+predictions = []
 for img_path in new_verify_images_path:
-        # 使用cv2读取图片
-        img = cv2.imread(img_path)
-        img_pic = Image.fromarray(img)   #保留picture形式，方便之后添加文字用
-        #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # 将BGR转为RGB
-       
-        # 应用转换并将图像添加批次维度
-        img_tensor = transform(img_pic).unsqueeze(0)
-        
-        # 进行预测
-        output = spread(img_tensor)
-        _, predicted = torch.max(output, 1)  # 获取预测类别
-        if predicted.item()==0:
-            label="crack"
-        else:
-            label="non_crack"
-        predictions.append((img_path,label))
-        
-        draw = ImageDraw.Draw(img_pic)
-        #font = ImageFont.load_default()  # 默认字体
-        font = ImageFont.truetype("arial.ttf", 40)  # 设置字体大小为40
-        word=f"predict class:{label}"
-        draw.text((10,10),word,fill="black",font=font)
-        img_name = os.path.basename(img_path)  # 提取文件名
-        img_pic.save(os.path.join(final_path,img_name))
+    # 读取图片
+    img = cv2.imread(img_path)
+    img_pic = Image.fromarray(img)  # 转为 PIL 图片格式，方便后续处理
+
+    # 图像预处理
+    img_tensor = transform(img_pic).unsqueeze(0)  # 增加批次维度（batch size）
+
+    # 将数据传递到 model_test 函数进行预测
+    output = model_test(model, img_tensor)  # 获取模型输出
+
+    # 获取预测结果
+    _, predicted = torch.max(output, 1)  # 获取预测的类别
+    label = "crack" if predicted.item() == 0 else "non_crack"  # 根据预测的类别索引获取标签
+    predictions.append((img_path, label))
+
+    # 在图片上添加预测结果
+    draw = ImageDraw.Draw(img_pic)
+    font = ImageFont.truetype("arial.ttf", 40)  # 设置字体大小
+    word = f"predict class: {label}"
+    draw.text((10, 10), word, fill="black", font=font)
+
+    # 保存带有标签的图片
+    img_name = os.path.basename(img_path)  # 获取图片文件名
+    img_pic.save(os.path.join(final_path, img_name))  # 保存图片到 final 文件夹
+
+# 输出预测结果（可选）
+for img_path, pred in predictions:
+    print(f"Image: {img_path}, Predicted Class: {pred}")
 
 print("End")
-# 打印结果
-#for img_path, pred in predictions:
-  #  print(f"image: {img_path}, predicted class: {pred}")
-
