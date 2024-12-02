@@ -114,35 +114,7 @@ class CNN(nn.Module):
 num_classes = len(classes)
 model = CNN(num_classes=num_classes)  
 
-#构建CNN模型
-"""
-#卷积层
-con_layers=nn.Sequential(
-    nn.Conv2d(3, 32, kernel_size=3, stride=1, padding=1), 
-    #32*256*256
-    # 输入通道=3(颜色)，输出通道=32（自定义，自调整） ,卷积核大小3*3，步长为1，填充为1
-    nn.ReLU(),   # 激活函数,增加非线性特征
-    
-    #池化操作(最大池化)
-    nn.MaxPool2d(kernel_size=2, stride=2),                 # 尺寸减半：256*256 到 128*128（通过2*2的池化窗口实现）
-    nn.Conv2d(32,32, kernel_size=3, stride=1, padding=1), # 输入通道=32保持不变
-    #nn.Conv2d(32,64, kernel_size=3, stride=1, padding=1)  #32->64
-    nn.ReLU(),                                             # 激活函数
-    nn.MaxPool2d(kernel_size=2, stride=2),                 # 尺寸减半：128*128 到 64*64
-    )
-#全连接层
-fc_layers=nn.Sequential(
-    nn.Flatten(),     # 展平特征图
-    nn.Linear(32 * 64 * 64, 128),     # 输入维度=64*64*64，输出=128
-    nn.ReLU(),                                             # 激活函数
-    nn.Linear(128, sum_classes)
-    )
-#定义传播函数
-def spread(i):
-    i=con_layers(i)
-    i=fc_layers(i)
-    return i
-"""
+
 # 定义损失函数和优化器
 loss = nn.CrossEntropyLoss()  # 损失函数
 optimizer = optim.Adam(model.parameters(), lr=0.001)

@@ -5,34 +5,23 @@ from torchvision import transforms
 from PIL import Image, ImageDraw, ImageFont
 import cv2
 from Denoising import medianblur  # 调用去噪库中的中值滤波函数
-from CNN_model import CNN
+from CNN_model import CNN         # 导入CNN模型
 
 import torch
 import torch.nn as nn
 
-# 定义计算损失和返回输出的函数（只需要返回输出，不需要计算损失）
+# 定义计算损失和返回输出的函数
 def model_out_loss(input_data, model):
-    """
-    计算模型输出，返回模型的预测结果
-    
-    参数:
-    input_data (tensor): 输入的图像数据
-    model (nn.Module): 训练好的模型
-    
-    返回:
-    output (tensor): 模型的输出
-    """
+
     model.eval()  # 设置模型为评估模式
-    with torch.no_grad():  # 禁用梯度计算
+    with torch.no_grad():  # 不用梯度计算
         output = model(input_data)  # 获取模型的输出
     return output
 
 def model_test(model, test_data):
-    """
-    使用训练好的模型进行预测
-    """
+
     model.eval()  # 设置模型为评估模式
-    with torch.no_grad():  # 在推理过程中不计算梯度
+    with torch.no_grad():  # 不计算梯度
         output = model_out_loss(test_data, model)  # 获取模型输出
     return output
 
@@ -57,11 +46,9 @@ new_verify_images_path = [os.path.join(denoising_verify_images_path, f) for f in
 
 # 加载模型
 model = torch.load("cnn_model.pkl")  # 加载完整的模型（包括结构和权重）
-model.eval()  # 设置模型为评估模式
+#model.eval()  # 设置模型为评估模式
 
-# 确保保存结果的文件夹存在
-os.makedirs(final_path, exist_ok=True)
-
+print(model)
 # 预测和保存结果
 predictions = []
 for img_path in new_verify_images_path:
@@ -88,10 +75,6 @@ for img_path in new_verify_images_path:
 
     # 保存带有标签的图片
     img_name = os.path.basename(img_path)  # 获取图片文件名
-    img_pic.save(os.path.join(final_path, img_name))  # 保存图片到 final 文件夹
+    #img_pic.save(os.path.join(final_path, img_name))  # 保存图片到 final 文件夹
 
-# 输出预测结果（可选）
-for img_path, pred in predictions:
-    print(f"Image: {img_path}, Predicted Class: {pred}")
-
-print("End")
+print("ok")
