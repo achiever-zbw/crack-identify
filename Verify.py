@@ -49,7 +49,7 @@ medianblur(verify_images_path, denoising_verify_images_path, kernel_size)
 
 # 数据预处理（和训练集一样）
 transform = transforms.Compose([
-    transforms.Resize([256, 256]),  # 与训练集图片大小一致
+    transforms.Resize([128, 128]),  # 与训练集图片大小一致
     transforms.ToTensor(),
     transforms.Normalize([0.5], [0.5])  # 标准化
 ])
