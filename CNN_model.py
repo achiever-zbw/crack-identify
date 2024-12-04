@@ -89,7 +89,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.001)
 losses = []
 
 # 训练模型
-num_epochs = 100
+num_epochs = 200
 for each in range(num_epochs):
     model.train()  # 设置模型为训练模式
     running_loss = 0.0
@@ -112,7 +112,7 @@ for each in range(num_epochs):
         total += labels.size(0)  # 总样本数
         correct += (predicted == labels).sum().item()  # 正确的预测数
 
-    # 每个 epoch 的损失和准确率
+     # 每个 epoch 的损失和准确率
     each_loss = running_loss / len(dataloader)
     losses.append(each_loss)  # 将当前的损失添加到 losses 列表
     each_acc = 100 * correct / total  # 计算准确率（百分比）
