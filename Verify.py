@@ -9,6 +9,10 @@ from CNN_model import CNN         # 导入CNN模型
 
 import torch
 import torch.nn as nn
+import matplotlib
+matplotlib.use('TkAgg')  # 使用 TkAgg 后端
+import matplotlib.pyplot as plt
+
 
 # 定义计算损失和返回输出的函数
 def model_out_loss(input_data, model):

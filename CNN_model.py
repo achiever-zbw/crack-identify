@@ -1,16 +1,17 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Nov 15 11:20:46 2024
 
-@author: 赵博文
-"""
 
-import os
+
 import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
+from PIL import Image  # 用于图像显示
 from Denoising import medianblur  # 调用去噪库中的中值滤波函数
+import matplotlib
+matplotlib.use('TkAgg')  # 使用 TkAgg 后端
+import matplotlib.pyplot as plt
+
+
 
 # 待去噪的图片路径
 non_denoising_crack_path = './crack-identify/train_images/crack'
@@ -33,7 +34,7 @@ transform = transforms.Compose([
     transforms.RandomHorizontalFlip(),  # 随机水平翻转
     transforms.RandomVerticalFlip(),  # 随机垂直翻转
     transforms.ToTensor(),
-    transforms.Normalize([0.5], [0.5])
+    transforms.Normalize([0.5], [0.5])  # 图像标准化
 ])
 
 # 加载数据集
@@ -45,7 +46,6 @@ classes = dataset.classes
 sum_classes = len(classes)
 
 # 构建CNN模型
-
 class CNN(nn.Module):
     def __init__(self, num_classes):
         super(CNN, self).__init__()
@@ -77,16 +77,19 @@ class CNN(nn.Module):
         x = self.fc_layers(x)  # 通过全连接层
         return x
 
-
+# 获取类别数量并初始化模型
 num_classes = len(classes)
 model = CNN(num_classes=num_classes)
 
 # 定义损失函数和优化器
 loss = nn.CrossEntropyLoss()  # 损失函数
-optimizer = optim.Adam(model.parameters(), lr=0.0005)
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+# 记录每个 epoch 的损失
+losses = []
 
 # 训练模型
-num_epochs = 50
+num_epochs = 100
 for each in range(num_epochs):
     model.train()  # 设置模型为训练模式
     running_loss = 0.0
@@ -111,9 +114,19 @@ for each in range(num_epochs):
 
     # 每个 epoch 的损失和准确率
     each_loss = running_loss / len(dataloader)
+    losses.append(each_loss)  # 将当前的损失添加到 losses 列表
     each_acc = 100 * correct / total  # 计算准确率（百分比）
     print(f'Epoch [{each+1}/{num_epochs}], Loss: {each_loss:.2f}, Accuracy: {each_acc:.2f}%')
 
-# 保存模型
-torch.save(model, 'cnn_model.pkl')  # 修改pth格式为pkl
-print("模型已保存")
+
+
+# 绘制损失变化图像并保存
+plt.plot(range(1, num_epochs + 1), losses, label='Training Loss')  # 绘制损失曲线
+plt.xlabel('Epochs')  # X 轴标签
+plt.ylabel('Loss')  # Y 轴标签
+plt.title('Training Loss over Epochs')  # 图像标题
+plt.legend()
+
+# 保存图像到文件
+plt.savefig('loss_curve.png')  # 将图像保存为 .png 文件
+print("损失曲线图已保存")
