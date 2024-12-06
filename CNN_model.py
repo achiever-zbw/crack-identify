@@ -1,6 +1,6 @@
 
 
-
+import matplotlib.pyplot as plt
 import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
@@ -9,8 +9,6 @@ from PIL import Image  # 用于图像显示
 from Denoising import medianblur  # 调用去噪库中的中值滤波函数
 import matplotlib
 matplotlib.use('TkAgg')  # 使用 TkAgg 后端
-import matplotlib.pyplot as plt
-
 
 
 # 待去噪的图片路径
@@ -34,7 +32,8 @@ transform = transforms.Compose([
     transforms.RandomHorizontalFlip(),  # 随机水平翻转
     transforms.RandomVerticalFlip(),  # 随机垂直翻转
     transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # 图像标准化
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[
+                         0.229, 0.224, 0.225])  # 图像标准化
 ])
 
 # 加载数据集
@@ -46,11 +45,14 @@ classes = dataset.classes
 sum_classes = len(classes)
 
 # 构建CNN模型
+
+
 class CNN(nn.Module):
     def __init__(self, num_classes):
         super(CNN, self).__init__()
         self.conv_layers = nn.Sequential(
-            nn.Conv2d(3, 32, kernel_size=5, stride=1, padding=2),  # 输入通道=3，输出通道=32 ,卷积核大小5*5，步长为1，填充为2
+            # 输入通道=3，输出通道=32 ,卷积核大小5*5，步长为1，填充为2
+            nn.Conv2d(3, 32, kernel_size=5, stride=1, padding=2),
             nn.ReLU(),   # 激活函数
 
             nn.MaxPool2d(kernel_size=2, stride=2),  # 尺寸减半：128*128 到 64*64
@@ -77,13 +79,14 @@ class CNN(nn.Module):
         x = self.fc_layers(x)  # 通过全连接层
         return x
 
+
 # 获取类别数量并初始化模型
 num_classes = len(classes)
 model = CNN(num_classes=num_classes)
 
 # 定义损失函数和优化器
 loss = nn.CrossEntropyLoss()  # 损失函数
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+optimizer = optim.Adam(model.parameters(), lr=0.01)
 
 # 记录每个 epoch 的损失
 losses = []
@@ -117,7 +120,6 @@ for each in range(num_epochs):
     losses.append(each_loss)  # 将当前的损失添加到 losses 列表
     each_acc = 100 * correct / total  # 计算准确率（百分比）
     print(f'Epoch [{each+1}/{num_epochs}], Loss: {each_loss:.2f}, Accuracy: {each_acc:.2f}%')
-
 
 
 # 绘制损失变化图像并保存

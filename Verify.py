@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import os
 import torch
 from torch.utils.data import DataLoader
@@ -11,7 +12,6 @@ import torch
 import torch.nn as nn
 import matplotlib
 matplotlib.use('TkAgg')  # 使用 TkAgg 后端
-import matplotlib.pyplot as plt
 
 
 # 定义计算损失和返回输出的函数
@@ -22,6 +22,7 @@ def model_out_loss(input_data, model):
         output = model(input_data)  # 获取模型的输出
     return output
 
+
 def model_test(model, test_data):
 
     model.eval()  # 设置模型为评估模式
@@ -29,18 +30,20 @@ def model_test(model, test_data):
         output = model_out_loss(test_data, model)  # 获取模型输出
     return output
 
+
 def right_labels(Right_labels_path):
-    right_label={}
+    right_label = {}
     with open(Right_labels_path, "r") as f:
         for line in f:
-            part=line.strip().split(" ")
-            right_label[part[0]]=part[1]
-            
+            part = line.strip().split(" ")
+            right_label[part[0]] = part[1]
+
     return right_label
+
 
 # 定义路径
 Right_labels_path = './crack-identify/Right_labels.txt'
-right_label_dict=right_labels(Right_labels_path)
+right_label_dict = right_labels(Right_labels_path)
 
 # 定义路径
 verify_images_path = './crack-identify/verify_images'
@@ -55,24 +58,26 @@ medianblur(verify_images_path, denoising_verify_images_path, kernel_size)
 transform = transforms.Compose([
     transforms.Resize([128, 128]),  # 与训练集图片大小一致
     transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # 标准化
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[
+                         0.229, 0.224, 0.225])  # 标准化
 ])
 
 # 加载验证集图片路径
-new_verify_images_path = [os.path.join(denoising_verify_images_path, f) for f in os.listdir(denoising_verify_images_path)]
+new_verify_images_path = [os.path.join(
+    denoising_verify_images_path, f) for f in os.listdir(denoising_verify_images_path)]
 
 # 加载模型
 model = torch.load("cnn_model.pkl")  # 加载完整的模型（包括结构和权重）
-#model.eval()  # 设置模型为评估模式
+# model.eval()  # 设置模型为评估模式
 
-#print(model)
+# print(model)
 # 预测和保存结果
 predictions = []
-all_images=0
-corrcet_images=0
+all_images = 0
+corrcet_images = 0
 for img_path in new_verify_images_path:
     img_name = os.path.basename(img_path)  # 获取图片文件名
-    all_images+=1
+    all_images += 1
     # 读取图片
     img = cv2.imread(img_path)
     img_pic = Image.fromarray(img)  # 转为 PIL 图片格式，方便后续处理
@@ -86,9 +91,9 @@ for img_path in new_verify_images_path:
     # 获取预测结果
     _, predicted = torch.max(output, 1)  # 获取预测的类别
     label = "crack" if predicted.item() == 0 else "non_crack"  # 根据预测的类别索引获取标签
-    right_label=right_label_dict.get(img_name, "none")
-    if label==right_label:
-        corrcet_images+=1
+    right_label = right_label_dict.get(img_name, "none")
+    if label == right_label:
+        corrcet_images += 1
     predictions.append((img_name, label))
 
     # 在图片上添加预测结果
@@ -98,11 +103,11 @@ for img_path in new_verify_images_path:
     draw.text((10, 10), word, fill="black", font=font)
 
     # 保存带有标签的图片
-    #img_name = os.path.basename(img_path)  # 获取图片文件名
-    #img_pic.save(os.path.join(final_path, img_name))  # 保存图片到 final 文件夹
+    # img_name = os.path.basename(img_path)  # 获取图片文件名
+    # img_pic.save(os.path.join(final_path, img_name))  # 保存图片到 final 文件夹
 
-print("all_images:",all_images)
-print("corrcet_images:",corrcet_images)
-accuracy=corrcet_images/all_images*100
+print("all_images:", all_images)
+print("corrcet_images:", corrcet_images)
+accuracy = corrcet_images/all_images*100
 print(f"Accuracy: {accuracy:.2f}%")
 print("ok")
