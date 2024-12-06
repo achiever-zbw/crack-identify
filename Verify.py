@@ -55,7 +55,7 @@ medianblur(verify_images_path, denoising_verify_images_path, kernel_size)
 transform = transforms.Compose([
     transforms.Resize([128, 128]),  # 与训练集图片大小一致
     transforms.ToTensor(),
-    transforms.Normalize([0.5], [0.5])  # 标准化
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # 标准化
 ])
 
 # 加载验证集图片路径

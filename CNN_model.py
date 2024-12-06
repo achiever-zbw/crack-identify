@@ -34,7 +34,7 @@ transform = transforms.Compose([
     transforms.RandomHorizontalFlip(),  # 随机水平翻转
     transforms.RandomVerticalFlip(),  # 随机垂直翻转
     transforms.ToTensor(),
-    transforms.Normalize([0.5], [0.5])  # 图像标准化
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # 图像标准化
 ])
 
 # 加载数据集
