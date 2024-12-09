@@ -119,7 +119,8 @@ for each in range(num_epochs):
     each_loss = running_loss / len(dataloader)
     losses.append(each_loss)  # 将当前的损失添加到 losses 列表
     each_acc = 100 * correct / total  # 计算准确率（百分比）
-    print(f'Epoch [{each+1}/{num_epochs}], Loss: {each_loss:.2f}, Accuracy: {each_acc:.2f}%')
+    print(
+        f'Epoch [{each+1}/{num_epochs}], Loss: {each_loss:.2f}, Accuracy: {each_acc:.2f}%')
 
 
 # 绘制损失变化图像并保存
