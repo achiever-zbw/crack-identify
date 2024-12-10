@@ -86,7 +86,7 @@ model = CNN(num_classes=num_classes)
 
 # 定义损失函数和优化器
 loss = nn.CrossEntropyLoss()  # 损失函数
-optimizer = optim.Adam(model.parameters(), lr=0.01)
+optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 # 记录每个 epoch 的损失
 losses = []
