@@ -131,5 +131,5 @@ plt.title('Training Loss over Epochs')  # 图像标题
 plt.legend()
 
 # 保存图像到文件
-plt.savefig('loss_curve.png')  # 将图像保存为 .png 文件
+plt.savefig('/crack-identify/loss_curve.png')  # 将图像保存为 .png 文件
 print("损失曲线图已保存")
