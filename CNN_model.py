@@ -92,7 +92,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.001)
 losses = []
 
 # 训练模型
-num_epochs = 200
+num_epochs = 250
 for each in range(num_epochs):
     model.train()  # 设置模型为训练模式
     running_loss = 0.0
@@ -129,7 +129,7 @@ plt.xlabel('Epochs')  # X 轴标签
 plt.ylabel('Loss')  # Y 轴标签
 plt.title('Training Loss over Epochs')  # 图像标题
 plt.legend()
-
+plt.xticks(range(1, num_epochs + 1, 5))  # 每隔 5 个 epoch 显示一个标记
 # 保存图像到文件
 plt.savefig('/crack-identify/loss_curve.png')  # 将图像保存为 .png 文件
 print("损失曲线图已保存")
