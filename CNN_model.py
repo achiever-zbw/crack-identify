@@ -29,8 +29,8 @@ data_path = './crack-identify/Denoising_train_images'
 # 数据预处理
 transform = transforms.Compose([
     transforms.Resize([128, 128]),  # 输入调整为128x128
-    transforms.RandomHorizontalFlip(),  # 随机水平翻转
-    transforms.RandomVerticalFlip(),  # 随机垂直翻转
+    # transforms.RandomHorizontalFlip(),  # 随机水平翻转
+    # transforms.RandomVerticalFlip(),  # 随机垂直翻转
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[
                          0.229, 0.224, 0.225])  # 图像标准化
@@ -82,8 +82,8 @@ class CNN(nn.Module):
 
 # 获取类别数量并初始化模型
 num_classes = len(classes)
+# 创建模型并将其移动到设备（GPU 或 CPU）
 model = CNN(num_classes=num_classes)
-
 # 定义损失函数和优化器
 loss = nn.CrossEntropyLoss()  # 损失函数
 optimizer = optim.Adam(model.parameters(), lr=0.001)
@@ -92,7 +92,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.001)
 losses = []
 
 # 训练模型
-num_epochs = 250
+num_epochs = 250  # 参数可变循环找
 for each in range(num_epochs):
     model.train()  # 设置模型为训练模式
     running_loss = 0.0
@@ -100,8 +100,9 @@ for each in range(num_epochs):
     total = 0.0
 
     for i, (inputs, labels) in enumerate(dataloader, 0):
-        optimizer.zero_grad()  # 梯度清零, 每次训练前防止梯度叠加
-        outputs = model(inputs)  # 向前传播
+
+        optimizer.zero_grad()  # 梯度清零
+        outputs = model(inputs)  # 前向传播
         loss_data = loss(outputs, labels)  # 计算损失
 
         loss_data.backward()  # 反向传播
@@ -124,12 +125,13 @@ for each in range(num_epochs):
 
 
 # 绘制损失变化图像并保存
-plt.plot(range(1, num_epochs + 1), losses, label='Training Loss')  # 绘制损失曲线
+plt.plot(range(1, num_epochs + 1), losses,
+         label='Training Loss')  # 绘制损失曲线        科学计数法
 plt.xlabel('Epochs')  # X 轴标签
 plt.ylabel('Loss')  # Y 轴标签
 plt.title('Training Loss over Epochs')  # 图像标题
 plt.legend()
 plt.xticks(range(1, num_epochs + 1, 5))  # 每隔 5 个 epoch 显示一个标记
 # 保存图像到文件
-plt.savefig('/crack-identify/loss_curve.png')  # 将图像保存为 .png 文件
+plt.savefig('loss_curve.png')  # 将图像保存为 .png 文件
 print("损失曲线图已保存")
