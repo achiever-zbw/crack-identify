@@ -53,16 +53,19 @@ class CNN(nn.Module):
         self.conv_layers = nn.Sequential(
             # 输入通道=3，输出通道=32 ,卷积核大小5*5，步长为1，填充为2
             nn.Conv2d(3, 32, kernel_size=5, stride=1, padding=2),
-            nn.ReLU(),   # 激活函数
+            nn.LeakyReLU(negative_slope=0.01),   # LeakyReLU 激活函数
+
 
             nn.MaxPool2d(kernel_size=2, stride=2),  # 尺寸减半：128*128 到 64*64
 
             nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),  # 32到64
-            nn.ReLU(),  # 激活函数
+            nn.LeakyReLU(negative_slope=0.01),   # LeakyReLU 激活函数
+
             nn.MaxPool2d(kernel_size=2, stride=2),  # 尺寸减半：64*64 到 32*32
 
             nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),  # 64到128
-            nn.ReLU(),  # 激活函数
+            nn.LeakyReLU(negative_slope=0.01),   # LeakyReLU 激活函数
+
             nn.MaxPool2d(kernel_size=2, stride=2),  # 尺寸减半：32*32 到 16*16
         )
 
@@ -70,7 +73,7 @@ class CNN(nn.Module):
         self.fc_layers = nn.Sequential(
             nn.Flatten(),  # 展平特征图
             nn.Linear(128 * 16 * 16, 512),  # 输入维度=128*16*16，输出=512
-            nn.ReLU(),  # 激活函数
+            nn.LeakyReLU(negative_slope=0.01),   # LeakyReLU 激活函数
             nn.Linear(512, num_classes),  # 输出层，分类数=num_classes
         )
 
@@ -95,7 +98,7 @@ losses = []
 num_epochs = 250  # 参数可变循环找
 for each in range(num_epochs):
     model.train()  # 设置模型为训练模式
-    running_loss = 0.0
+    running_loss_ = 0.0
     correct = 0.0
     total = 0.0
 
