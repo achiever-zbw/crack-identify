@@ -36,12 +36,14 @@ class CNN(nn.Module):
             nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1),  # 128到256
             #nn.BatchNorm2d(256),  # 添加 BatchNorm
             nn.ReLU(),
+            
+            nn.MaxPool2d(kernel_size=2, stride=2),  # 尺寸减半：16x16 到 8x8
         )
 
         # 全连接层
         self.fc_layers = nn.Sequential(
             nn.Flatten(),  # 展平特征图
-            nn.Linear(128 * 16 * 16, 512),  # 输入维度=128*16*16，输出=512
+            nn.Linear(256 * 16 * 16, 512),  # 输入维度=128*16*16，输出=512
             nn.ReLU(),   # ReLU 激活函数
             nn.Linear(512, num_classes),  # 输出层，分类数=num_classes
         )
