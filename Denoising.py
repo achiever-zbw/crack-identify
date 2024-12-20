@@ -28,3 +28,16 @@ def medianblur(input_path,output_path,kernel_size):
         # 保存去噪后的图片
         cv2.imwrite(output_img_path, denoised_img)
         
+# 待去噪的图片路径
+non_denoising_crack_path = './crack-identify/train_images/crack'
+non_denoising_noncrack_path = './crack-identify/train_images/non_crack'
+
+# 去噪后的图片路径
+denoising_crack_path = './crack-identify/Denoising_train_images/crack'
+denoising_noncrack_path = './crack-identify/Denoising_train_images/non_crack'
+
+# 中值滤波器窗口大小，必须是奇数
+kernal_size = 5
+medianblur(non_denoising_noncrack_path, denoising_noncrack_path, kernal_size)
+medianblur(non_denoising_crack_path, denoising_crack_path, kernal_size)
+

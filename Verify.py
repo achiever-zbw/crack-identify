@@ -67,7 +67,10 @@ new_verify_images_path = [os.path.join(
     denoising_verify_images_path, f) for f in os.listdir(denoising_verify_images_path)]
 
 # 加载模型
-model = torch.load("cnn_model.pkl")  # 加载完整的模型（包括结构和权重）
+model = CNN(num_classes=2)  # 创建模型架构
+model.load_state_dict(torch.load('trained_model.pth'))  # 加载权重
+model.eval()  # 切换到评估模式
+ # 加载完整的模型（包括结构和权重）
 # model.eval()  # 设置模型为评估模式
 
 # print(model)
@@ -97,11 +100,7 @@ for img_path in new_verify_images_path:
     predictions.append((img_name, label))
 
     # 在图片上添加预测结果
-    draw = ImageDraw.Draw(img_pic)
-    font = ImageFont.truetype("arial.ttf", 40)  # 设置字体大小
-    word = f"predict class: {label}"
-    draw.text((10, 10), word, fill="black", font=font)
-
+    #
     # 保存带有标签的图片
     # img_name = os.path.basename(img_path)  # 获取图片文件名
     # img_pic.save(os.path.join(final_path, img_name))  # 保存图片到 final 文件夹

@@ -4,6 +4,7 @@ import itertools
 import sys
 from CNN_model import CNN
 import torch
+from torch.optim import lr_scheduler
 from torch import nn, optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
@@ -13,29 +14,18 @@ from Denoising import medianblur  # 调用去噪库中的中值滤波函数
 import matplotlib
 matplotlib.use('TkAgg')  # 使用 TkAgg 后端
 
-# 待去噪的图片路径
-non_denoising_crack_path = './crack-identify/train_images/crack'
-non_denoising_noncrack_path = './crack-identify/train_images/non_crack'
 
-# 去噪后的图片路径
-denoising_crack_path = './crack-identify/Denoising_train_images/crack'
-denoising_noncrack_path = './crack-identify/Denoising_train_images/non_crack'
-
-# 中值滤波器窗口大小，必须是奇数
-kernal_size = 5
-medianblur(non_denoising_noncrack_path, denoising_noncrack_path, kernal_size)
-medianblur(non_denoising_crack_path, denoising_crack_path, kernal_size)
 
 data_path = './crack-identify/Denoising_train_images'
 
 # 数据预处理
 transform = transforms.Compose([
     transforms.Resize([128, 128]),  # 输入调整为128x128
-    # transforms.RandomHorizontalFlip(),  # 随机水平翻转
-    # transforms.RandomVerticalFlip(),  # 随机垂直翻转
+    #transforms.RandomHorizontalFlip(),  # 随机水平翻转
+    #transforms.RandomVerticalFlip(),  # 随机垂直翻转
     transforms.ToTensor(),
-    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[
-                         0.5, 0.5, 0.5])  # 图像标准化
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[
+                         0.229, 0.224, 0.225])  # 图像标准化
 ])
 
 # 加载数据集
@@ -53,8 +43,9 @@ num_classes = len(classes)
 model = CNN(num_classes=num_classes)
 # 定义损失函数和优化器
 loss = nn.CrossEntropyLoss()  # 损失函数
-optimizer = optim.Adam(model.parameters(), lr=0.0001)
-
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+scheduler = lr_scheduler.StepLR(
+    optimizer, step_size=20, gamma=0.5)  # 每15个epoch将学习率减半
 # 记录每个 epoch 的损失
 losses = []
 
@@ -88,7 +79,9 @@ for each in range(num_epochs):
     losses.append(each_loss)  # 将当前的损失添加到 losses 列表
     each_acc = 100 * correct / total  # 计算准确率（百分比）
     print(
-        f'Epoch [{each+1}/{num_epochs}], Loss: {each_loss:.2f}, Accuracy: {each_acc:.2f}%')
+        f'Epoch [{each+1}/{num_epochs}], Loss: {each_loss:.4f}, Accuracy: {each_acc:.4f}%')
+
+    scheduler.step()
 
 
 # 绘制损失变化图像并保存
@@ -100,5 +93,5 @@ plt.title('Training Loss over Epochs')  # 图像标题
 plt.legend()
 plt.xticks(range(1, num_epochs + 1, 5))  # 每隔 5 个 epoch 显示一个标记
 # 保存图像到文件
-plt.savefig('train3_200_lr_0.001_mean_0.5.png')  # 将图像保存为 .png 文件
+plt.savefig('12.19_18pm_.png')  # 将图像保存为 .png 文件
 print("损失曲线图已保存")
