@@ -45,7 +45,7 @@ model = CNN(num_classes=num_classes)
 loss = nn.CrossEntropyLoss()  # 损失函数
 optimizer = optim.Adam(model.parameters(), lr=0.002)
 scheduler = lr_scheduler.StepLR(
-    optimizer, step_size=20, gamma=0.5)  # 每15个epoch将学习率减半
+    optimizer, step_size=20, gamma=0.5)  # 每20个epoch将学习率减半
 # 记录每个 epoch 的损失
 losses = []
 
