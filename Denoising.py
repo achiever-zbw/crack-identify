@@ -41,3 +41,4 @@ kernal_size = 5
 medianblur(non_denoising_noncrack_path, denoising_noncrack_path, kernal_size)
 medianblur(non_denoising_crack_path, denoising_crack_path, kernal_size)
 
+print("图片去噪完成")
