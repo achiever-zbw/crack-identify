@@ -34,7 +34,7 @@ class CNN(nn.Module):
             nn.ReLU(),
 
             nn.MaxPool2d(kernel_size=2, stride=2),  # 尺寸减半：128*128 到 64*64
-            
+
             IC(32, dropout=0.5),
             nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),  # 32到64
             # nn.Dropout(0.5),
@@ -67,4 +67,16 @@ class CNN(nn.Module):
     def forward(self, x):
         x = self.conv_layers(x)  # 通过卷积层
         x = self.fc_layers(x)  # 通过全连接层
+        return x
+
+
+class IC(nn.Module):
+    def __init__(self, channels, dropout):
+        super(IC, self).__init__()
+        self.batchnorm = nn.BatchNorm2d(channels)  # 定义 BatchNorm2d 层
+        self.dropout = nn.Dropout2d(dropout)      # 定义 Dropout2d 层
+
+    def forward(self, x):
+        x = self.batchnorm(x)  # 批归一化
+        x = self.dropout(x)    # Dropout
         return x
