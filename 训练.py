@@ -9,11 +9,10 @@ from torch import nn, optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 from PIL import Image  # 用于图像显示
-#from Denoising import medianblur  # 调用去噪库中的中值滤波函数
+# from Denoising import medianblur  # 调用去噪库中的中值滤波函数
 
 import matplotlib
 matplotlib.use('TkAgg')  # 使用 TkAgg 后端
-
 
 
 data_path = './crack-identify/Denoising_train_images'
@@ -21,8 +20,8 @@ data_path = './crack-identify/Denoising_train_images'
 # 数据预处理
 transform = transforms.Compose([
     transforms.Resize([128, 128]),  # 输入调整为128x128
-    #transforms.RandomHorizontalFlip(),  # 随机水平翻转
-    #transforms.RandomVerticalFlip(),  # 随机垂直翻转
+    # transforms.RandomHorizontalFlip(),  # 随机水平翻转
+    # transforms.RandomVerticalFlip(),  # 随机垂直翻转
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[
                          0.229, 0.224, 0.225])  # 图像标准化
@@ -50,11 +49,11 @@ scheduler = lr_scheduler.StepLR(
 losses = []
 
 # 训练模型
-num_epochs = 200  # 参数可变循环找
+num_epochs = 220  # 参数可变循环找
 for each in range(num_epochs):
     model.train()  # 设置模型为训练模式
     running_loss = 0.0
-    correct = 0.0 
+    correct = 0.0
     total = 0.0
 
     for i, (inputs, labels) in enumerate(dataloader, 0):
@@ -93,7 +92,7 @@ plt.title('Training Loss over Epochs')  # 图像标题
 plt.legend()
 plt.xticks(range(1, num_epochs + 1, 5))  # 每隔 5 个 epoch 显示一个标记
 # 保存图像到文件
-plt.savefig('12.21_10am_.png')  # 将图像保存为 .png 文件
+plt.savefig('12.22_12am_.png')  # 将图像保存为 .png 文件
 print("损失曲线图已保存")
 
 # 保存模型
