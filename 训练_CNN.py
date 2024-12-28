@@ -1,8 +1,10 @@
 
+import numpy as np
+import sympy as sp
 import matplotlib.pyplot as plt
 import itertools
 import sys
-from Model import CNN
+from Model import CNN_3
 import torch
 from torch.optim import lr_scheduler
 from torch import nn, optim
@@ -36,8 +38,7 @@ sum_classes = len(classes)
 
 # 获取类别数量并初始化模型
 num_classes = len(classes)
-# 创建模型并将其移动到设备gpu
-model = CNN(num_classes=num_classes)
+model = CNN_3(num_classes=num_classes)
 # 定义损失函数和优化器
 loss = nn.CrossEntropyLoss()  # 损失函数
 optimizer = optim.Adam(model.parameters(), lr=0.002)
@@ -80,17 +81,17 @@ for each in range(num_epochs):
     scheduler.step()
 
 # 绘制损失变化图像并保存
-plt.plot(range(1, num_epochs + 1), losses,
+plt.plot(range(1, 201), losses,
          label='Training Loss')  # 绘制损失曲线
 plt.xlabel('Epochs')  # X 轴标签
 plt.ylabel('Loss')  # Y 轴标签
 plt.title('Training Loss over Epochs')  # 图像标题
 plt.legend()
-plt.xticks(range(1, num_epochs + 1, 5))  # 每隔 5 个 epoch 显示一个标记
 # 保存图像到文件
-plt.savefig('12.25_final.png')  # 将图像保存为 .png 文件
+plt.savefig('12.28_CNN_3_IC.png')  # 将图像保存为 .png 文件
 print("损失曲线图已保存")
 
 # 保存模型
 torch.save(model.state_dict(), 'trained_model.pth')
 print("模型已保存")
+
