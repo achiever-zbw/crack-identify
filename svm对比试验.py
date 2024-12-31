@@ -99,9 +99,3 @@ for image_path in verify_images:
 accuracy = accuracy_score(verify_labels, prediction)
 print(f'验证集准确率: {accuracy * 100:.2f}%')
 
-# 保存结果到文件
-with open(os.path.join(final_path, 'svm_verification_results.txt'), 'w') as f:
-    for img_path, pred, true_label in zip(verify_images, prediction, verify_labels):
-        f.write(f'{img_path}: Predicted: {pred}, True label: {true_label}\n')
-
-print("SVM验证结果已保存至svm_verification_results.txt")
