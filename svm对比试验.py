@@ -12,7 +12,6 @@ from Verify import right_labels
 # 数据路径
 data_path = './crack-identify/Denoising_train_images'
 
-# 数据预处理：将图像调整为128x128并转换为Tensor
 transform = transforms.Compose([
     transforms.Resize([128, 128]),  # 输入调整为128x128
     transforms.ToTensor(),  # 转换为Tensor
@@ -90,7 +89,7 @@ for image_path in verify_images:
 
     # 标准化
     img_data = scaler.transform(img_data)
-
+    
     # 使用SVM模型进行预测
     prediction_label = svm_model.predict(img_data)
     prediction.append(prediction_label[0])  # 预测结果
