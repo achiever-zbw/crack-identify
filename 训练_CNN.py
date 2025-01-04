@@ -4,15 +4,13 @@ import sympy as sp
 import matplotlib.pyplot as plt
 import itertools
 import sys
-from Model import CNN_3
+from Model import CNN_3,CNN_4_IC
 import torch
 from torch.optim import lr_scheduler
 from torch import nn, optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 from PIL import Image  # 用于图像显示
-# from Denoising import medianblur  # 调用去噪库中的中值滤波函数
-
 import matplotlib
 matplotlib.use('TkAgg')  # 使用 TkAgg 后端
 
@@ -38,12 +36,12 @@ sum_classes = len(classes)
 
 # 获取类别数量并初始化模型
 num_classes = len(classes)
-model = CNN_3(num_classes=num_classes)
+model = CNN_4_IC(num_classes=num_classes)
 # 定义损失函数和优化器
 loss = nn.CrossEntropyLoss()  # 损失函数
-optimizer = optim.Adam(model.parameters(), lr=0.002)
+optimizer = optim.Adam(model.parameters(), lr=0.001)
 scheduler = lr_scheduler.StepLR(
-    optimizer, step_size=20, gamma=0.5)  # 每20个epoch将学习率减半
+    optimizer, step_size=10, gamma=0.5)  # 每10个epoch将学习率减半
 # 记录每个 epoch 的损失
 losses = []
 
@@ -88,10 +86,10 @@ plt.ylabel('Loss')  # Y 轴标签
 plt.title('Training Loss over Epochs')  # 图像标题
 plt.legend()
 # 保存图像到文件
-plt.savefig('12.28_CNN_3_IC.png')  # 将图像保存为 .png 文件
+plt.savefig('1.4_CNN_4_IC.png')  # 将图像保存为 .png 文件
 print("损失曲线图已保存")
 
 # 保存模型
-torch.save(model.state_dict(), 'trained_model.pth')
+torch.save(model.state_dict(), 'trained_model_new.pth')
 print("模型已保存")
 

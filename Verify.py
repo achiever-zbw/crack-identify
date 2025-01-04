@@ -6,8 +6,7 @@ from torchvision import transforms
 from PIL import Image, ImageDraw, ImageFont
 import cv2
 from Denoising import medianblur  # 调用去噪库中的中值滤波函数
-from Model import CNN_3         # 导入CNN模型
-
+from Model import CNN_3, CNN_4_IC         # 导入CNN模型
 import torch
 import torch.nn as nn
 import matplotlib
@@ -67,8 +66,8 @@ new_verify_images_path = [os.path.join(
     denoising_verify_images_path, f) for f in os.listdir(denoising_verify_images_path)]
 
 # 加载模型
-model = CNN_3(num_classes=2)  # 创建模型架构
-model.load_state_dict(torch.load('trained_model.pth'))  # 加载权重
+model = CNN_4_IC(num_classes=2)  # 创建模型架构
+model.load_state_dict(torch.load('trained_model_new.pth'))  # 加载权重
 model.eval()  # 切换到评估模式
 # 加载完整的模型（包括结构和权重）
 
