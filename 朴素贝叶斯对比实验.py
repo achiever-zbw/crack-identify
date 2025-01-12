@@ -6,8 +6,7 @@ from sklearn.preprocessing import StandardScaler
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 from PIL import Image
-from Denoising import medianblur  # 调用去噪库中的中值滤波函数
-from Verify import right_labels
+from Classify import right_labels
 # 数据路径
 data_path = './crack-identify/Denoising_train_images'
 
@@ -53,13 +52,8 @@ Right_labels_path = './crack-identify/Right_labels.txt'
 right_label_dict = right_labels(Right_labels_path)
 
 # 定义路径
-verify_images_path = './crack-identify/verify_images'
-denoising_verify_images_path = './crack-identify/Denoising_verify_images'
-final_path = './crack-identify/final'
-kernel_size = 5  # 中值滤波器窗口大小
 
-# 去噪验证集图片
-medianblur(verify_images_path, denoising_verify_images_path, kernel_size)
+denoising_verify_images_path = './crack-identify/Denoising_verify_images'
 
 verify_images = [os.path.join(denoising_verify_images_path, f)
                  for f in os.listdir(denoising_verify_images_path)]
@@ -91,3 +85,12 @@ for image_path in verify_images:
 
 accuracy = accuracy_score(verify_true_labels, prediction)
 print(f'朴素贝叶斯验证集准确率: {accuracy * 100:.2f}%')
+
+# 检查训练数据的标签分布
+train_path = './crack-identify/Denoising_train_images'
+crack_path = os.path.join(train_path, 'crack')
+noncrack_path = os.path.join(train_path, 'non_crack')
+
+print("训练数据标签分布：")
+print(f"crack文件夹（标签0）图片数量: {len(os.listdir(crack_path))}")
+print(f"non_crack文件夹（标签1）图片数量: {len(os.listdir(noncrack_path))}")

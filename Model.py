@@ -1,19 +1,16 @@
-import itertools
-import sys
 import torch
 from torch import nn, optim
-from torch.utils.data import DataLoader
-from torchvision import datasets, transforms
-from PIL import Image  # 用于图像显示
-from Denoising import medianblur  # 调用去噪库中的中值滤波函数
+import torch.nn.functional as F
 
 # 定义IC层
+
 class IC(nn.Module):
     """
     定义IC层
     BatchNorm2d层
     Dropout2d层
     """
+
     def __init__(self, channels, dropout):
         super(IC, self).__init__()
         self.batchnorm = nn.BatchNorm2d(channels)  # 定义 BatchNorm2d 层
@@ -22,84 +19,6 @@ class IC(nn.Module):
     def forward(self, x):
         x = self.batchnorm(x)  # 批归一化
         x = self.dropout(x)    # Dropout
-        return x
-
-
-class CNN_4_IC(nn.Module):
-    def __init__(self, num_classes):
-        super(CNN_4_IC, self).__init__()
-        self.conv_layers = nn.Sequential(
-            # 输入通道=3，输出通道=32 ,卷积核大小5*5，步长为1，填充为2
-            IC(3, dropout=0.3),  # 引入IC层置于权重层前
-            nn.Conv2d(3, 32, kernel_size=5, stride=1, padding=2),
-            nn.ReLU(),
-            #nn.MaxPool2d(kernel_size=2, stride=2),  # 尺寸减半：128*128 到 64*64
-
-            IC(32, dropout=0.3),
-            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),  # 32到64
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),  # 尺寸减半：64*64 到 32*32
-
-            #IC(64, dropout=0.3),
-            nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),  # 64到128
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),  # 尺寸减半：32*32 到 16*16
-
-            #IC(128, dropout=0.5),
-            nn.Conv2d(128, 32, kernel_size=3, stride=1, padding=1),  # 128到64
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),  # 尺寸减半：16x16 到 8x8
-        )
-
-        # 全连接层
-        self.fc_layers = nn.Sequential(
-            nn.Flatten(),  # 展平特征图
-            nn.Linear(32*16*16, 64),
-            nn.ReLU(),
-            nn.Dropout(0.3),  # Dropout 防止过拟合
-            nn.Linear(64, num_classes),  # 输出层，分类数=num_classes
-        )
-
-    def forward(self, x):
-        x = self.conv_layers(x)  # 通过卷积层
-        x = self.fc_layers(x)  # 通过全连接层
-        return x
-
-
-class CNN_3(nn.Module):
-    def __init__(self, num_classes):
-        super(CNN_3, self).__init__()
-        self.conv_layers = nn.Sequential(
-            # 输入通道=3，输出通道=32 ,卷积核大小5*5，步长为1，填充为2
-            #IC(3, dropout=0.5),
-            nn.Conv2d(3, 32, kernel_size=5, stride=1, padding=2),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),  # 尺寸减半：128*128 到 64*64
-
-             IC(32, dropout=0.5),
-            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),  # 32到64
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),  # 尺寸减半：64*64 到 32*32
-
-            IC(64, dropout=0.5),
-            nn.Conv2d(64, 32, kernel_size=3, stride=1, padding=1),  # 64到128
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),  # 尺寸减半：32*32 到 16*16
-
-        )
-
-        # 全连接层
-        self.fc_layers = nn.Sequential(
-            nn.Flatten(),  # 展平特征图
-            nn.Linear(32*16*16, 64),
-            nn.ReLU(),
-            nn.Dropout(0.5),  # Dropout 防止过拟合
-            nn.Linear(64, num_classes),  # 输出层，分类数=num_classes
-        )
-
-    def forward(self, x):
-        x = self.conv_layers(x)  # 通过卷积层
-        x = self.fc_layers(x)  # 通过全连接层
         return x
 
 
@@ -115,3 +34,119 @@ class MLP(nn.Module):  # 继承父类
         out = self.reLu(out)  # 将match1的结果激活
         out = self.fc2(out)  # 激活后的输入传达到第二个全连接层
         return out  # 返回最后一个out值
+
+class CNN_4_IC(nn.Module):
+    """4层CNN模型,包含IC层
+
+    Args:
+        num_classes (int): 分类数
+    """
+    
+    def __init__(self, num_classes):
+        super(CNN_4_IC, self).__init__()
+        self.conv_layers = nn.Sequential(
+            # 第一层保持不变
+            IC(3, dropout=0.1),
+            nn.Conv2d(3, 32, kernel_size=5, padding=2),
+            nn.ReLU(),
+            nn.MaxPool2d(2),  # 128 -> 64
+
+            # 第二层
+            IC(32, dropout=0.1),
+            nn.Conv2d(32, 64, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),  # 64 -> 32
+
+            # 第三层
+            IC(64, dropout=0.2),
+            nn.Conv2d(64, 128, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),  # 32 -> 16
+
+            # 第四层 
+            IC(128, dropout=0.3),
+            nn.Conv2d(128, 256, kernel_size=3, padding=1),
+            nn.ReLU(),
+            # 移除池化层，保持16x16
+            nn.MaxPool2d(2),  # 16 -> 8
+            
+        )
+
+        # 调整全连接层
+        self.fc_layers = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(256 * 8 * 8, 512),  # 更大的特征维度
+            nn.BatchNorm1d(512),
+            nn.ReLU(),
+            nn.Dropout(0.5),
+            nn.Linear(512, 128),
+            nn.BatchNorm1d(128),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(128, num_classes)
+        )
+
+    def forward(self, x):
+        x = self.conv_layers(x)  # 通过卷积层
+        x = self.fc_layers(x)  # 通过全连接层
+        return x
+
+class CNN_4(nn.Module):
+    """4层CNN模型
+
+    Args:
+        num_classes (int): 分类数
+        dropout (float): Dropout率
+        kernel_size (int): 卷积核大小
+        stride (int): 步长
+        padding (int): 填充
+    """
+    def __init__(self, num_classes):
+        """初始化
+        """
+        super(CNN_4, self).__init__()
+        self.conv_layers = nn.Sequential(
+            # 第一层 - 减少初始通道数
+            nn.Conv2d(3, 48, kernel_size=3, stride=1, padding=1),  # 48->32
+            nn.BatchNorm2d(48),
+            nn.ReLU(),
+            nn.Dropout2d(0.2),
+            nn.MaxPool2d(kernel_size=2),
+
+            # 第二层 - 平缓增长
+            nn.Conv2d(48, 96, kernel_size=3, stride=1, padding=1),  # 96->64
+            nn.BatchNorm2d(96),
+            nn.ReLU(),
+            nn.Dropout2d(0.3),
+            nn.MaxPool2d(kernel_size=2),
+
+            # 第三层 - 适度增长
+            nn.Conv2d( 96, 192, kernel_size=3, stride=1, padding=1),  # 192->128
+            nn.BatchNorm2d(192),
+            nn.ReLU(),
+            nn.Dropout2d(0.6),
+            nn.MaxPool2d(kernel_size=2),
+            
+            # 第四层 - 平滑收敛
+            nn.Conv2d(192, 96, kernel_size=3, stride=1, padding=1),  # 64->48
+            nn.BatchNorm2d(96),
+            nn.ReLU(),
+            nn.Dropout2d(0.4),
+            nn.MaxPool2d(kernel_size=2)
+        )
+
+        # 调整全连接层
+        self.fc_layers = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(96 * 8 * 8, 512),  # 增大维度 512->1024
+            nn.ReLU(),
+            nn.Dropout(0.5),
+            nn.Linear(512, num_classes)
+        )
+
+    def forward(self, x):
+        """前向传播
+        """
+        x = self.conv_layers(x)
+        x = self.fc_layers(x)
+        return x

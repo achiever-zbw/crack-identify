@@ -6,8 +6,7 @@ from sklearn.preprocessing import StandardScaler
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 from PIL import Image
-from Denoising import medianblur  # 调用去噪库中的中值滤波函数
-from Verify import right_labels
+from Classify import right_labels
 
 # 数据路径
 data_path = './crack-identify/Denoising_train_images'
@@ -55,11 +54,6 @@ right_label_dict = right_labels(Right_labels_path)
 # 定义路径
 verify_images_path = './crack-identify/verify_images'
 denoising_verify_images_path = './crack-identify/Denoising_verify_images'
-final_path = './crack-identify/final'
-kernel_size = 5  # 中值滤波器窗口大小
-
-# 去噪验证集图片
-medianblur(verify_images_path, denoising_verify_images_path, kernel_size)
 
 verify_images = [os.path.join(denoising_verify_images_path, f)
                  for f in os.listdir(denoising_verify_images_path)]

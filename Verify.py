@@ -5,13 +5,10 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 from PIL import Image, ImageDraw, ImageFont
 import cv2
-from Denoising import medianblur  # 调用去噪库中的中值滤波函数
-from Model import CNN_3, CNN_4_IC         # 导入CNN模型
+from Model import CNN_4,CNN_4_IC  # 导入CNN模型
 import torch
-import torch.nn as nn
-import matplotlib
-matplotlib.use('TkAgg')  # 使用 TkAgg 后端
-
+import torch.nn as nn 
+from Classify import right_labels
 
 # 定义计算损失和返回输出的函数
 def model_out_loss(input_data, model):
@@ -30,14 +27,7 @@ def model_test(model, test_data):
     return output
 
 
-def right_labels(Right_labels_path):
-    right_label = {}
-    with open(Right_labels_path, "r") as f:
-        for line in f:
-            part = line.strip().split(" ")
-            right_label[part[0]] = part[1]
 
-    return right_label
 
 
 # 定义路径
@@ -45,15 +35,9 @@ Right_labels_path = './crack-identify/Right_labels.txt'
 right_label_dict = right_labels(Right_labels_path)
 
 # 定义路径
-verify_images_path = './crack-identify/verify_images'
+# verify_images_path = './crack-identify/verify_images'
 denoising_verify_images_path = './crack-identify/Denoising_verify_images'
-final_path = './crack-identify/final'
-kernel_size = 5  # 中值滤波器窗口大小
 
-# 去噪验证集图片
-medianblur(verify_images_path, denoising_verify_images_path, kernel_size)
-
-# 数据预处理（和训练集一样）
 transform = transforms.Compose([
     transforms.Resize([128, 128]),  # 与训练集图片大小一致
     transforms.ToTensor(),
@@ -66,8 +50,8 @@ new_verify_images_path = [os.path.join(
     denoising_verify_images_path, f) for f in os.listdir(denoising_verify_images_path)]
 
 # 加载模型
-model = CNN_4_IC(num_classes=2)  # 创建模型架构
-model.load_state_dict(torch.load('trained_model_new.pth'))  # 加载权重
+model = CNN_4(num_classes=2)  # 创建模型架构
+model.load_state_dict(torch.load('trained_model_CNN_4.pth'))  # 加载权重
 model.eval()  # 切换到评估模式
 # 加载完整的模型（包括结构和权重）
 
