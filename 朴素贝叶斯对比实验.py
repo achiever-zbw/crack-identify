@@ -1,3 +1,10 @@
+"""朴素贝叶斯对比实验
+1.数据集划分
+2.数据预处理
+3.模型创建
+4.训练模型
+5.验证模型
+"""
 import numpy as np
 import os
 from sklearn.naive_bayes import GaussianNB

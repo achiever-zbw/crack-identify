@@ -1,4 +1,12 @@
-
+"""MLP训练
+1.数据集划分
+2.数据预处理
+3.模型创建
+4.损失函数，优化器，学习率调度器
+5.训练模型
+6.保存模型
+7.绘制损失变化图像并保存
+"""
 import matplotlib.pyplot as plt
 import itertools
 import sys

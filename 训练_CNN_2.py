@@ -5,12 +5,13 @@ import matplotlib.pyplot as plt
 import torch
 from torch import nn, optim
 from torch.optim import lr_scheduler
-from Model import CNN_4
+from Model import CNN_4,CNN_4_new # CNN_4的模型导入
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
-from Unbalanced_Data import UnbalancedDataset
+from Class_Libraries import UnbalancedDataset
 import matplotlib
 matplotlib.use('TkAgg')  # 使用 TkAgg 后端
+
 
 
 data_dir = './crack-identify/Denoising_train_images'
@@ -21,7 +22,7 @@ val_size = total_size - train_size
 
 # 创建验证集时使用is_train=False
 train_dataset, val_dataset = random_split(
-    full_dataset, 
+    full_dataset,
     [train_size, val_size],
     generator=torch.Generator().manual_seed(42)
 )
@@ -43,21 +44,13 @@ print("模型已创建")
 loss_function = nn.CrossEntropyLoss()
 optimizer = optim.AdamW(
     model.parameters(),
-    lr=0.001,
-    weight_decay=0.05
+    lr=0.004,
+    weight_decay=0.1,
+    betas=(0.9, 0.999)
 )
 
 # 学习率调度器
-scheduler = lr_scheduler.OneCycleLR(
-    optimizer,
-    max_lr=0.001,
-    epochs=200,
-    steps_per_epoch=len(train_dataloader),
-    pct_start=0.3,  # 30%时达到最大学习率
-    div_factor=25,  # 初始学习率除以25
-    final_div_factor=1000  # 最终学习率除以1000
-)
-
+scheduler = lr_scheduler.StepLR(optimizer, step_size=40, gamma=0.3)
 # 记录每个 epoch 的损失
 losses = []
 # 训练模型
@@ -115,7 +108,7 @@ for each in range(num_epochs):
         f'Val Loss: {val_loss/len(val_dataloader):.4f} | Val Acc: {val_acc:.2f}%')
 
 # 保存模型
-torch.save(model.state_dict(), 'trained_model_CNN_4_new.pth')
+torch.save(model.state_dict(), 'trained_model_CNN_4_对比.pth')
 print("模型已保存")
 
 
@@ -127,5 +120,5 @@ plt.ylabel('Loss')  # Y 轴标签
 plt.title('Training Loss over Epochs')  # 图像标题
 plt.legend()
 # 保存图像到文件
-plt.savefig('1.12_CNN_4_new.png')  # 将图像保存为 .png 文件
+plt.savefig('1.16_CNN_4_对比.png')  # 将图像保存为 .png 文件
 print("损失曲线图已保存")

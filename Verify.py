@@ -1,14 +1,15 @@
 import matplotlib.pyplot as plt
 import os
 import torch
+import cv2
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from PIL import Image, ImageDraw, ImageFont
-import cv2
-from Model import CNN_4,CNN_4_IC  # 导入CNN模型
+from Model import CNN_4,CNN_4_new  # 导入CNN模型
 import torch
 import torch.nn as nn 
 from Classify import right_labels
+from Class_Libraries import Detector
 
 # 定义计算损失和返回输出的函数
 def model_out_loss(input_data, model):
@@ -28,12 +29,10 @@ def model_test(model, test_data):
 
 
 
-
-
 # 定义路径
 Right_labels_path = './crack-identify/Right_labels.txt'
 right_label_dict = right_labels(Right_labels_path)
-
+output_path = './crack-identify/final'
 # 定义路径
 # verify_images_path = './crack-identify/verify_images'
 denoising_verify_images_path = './crack-identify/Denoising_verify_images'
@@ -50,8 +49,8 @@ new_verify_images_path = [os.path.join(
     denoising_verify_images_path, f) for f in os.listdir(denoising_verify_images_path)]
 
 # 加载模型
-model = CNN_4(num_classes=2)  # 创建模型架构
-model.load_state_dict(torch.load('trained_model_CNN_4.pth'))  # 加载权重
+model = CNN_4_new(num_classes=2)  # 创建模型架构
+model.load_state_dict(torch.load('trained_model_CNN_4_对比.pth'))  # 加载权重
 model.eval()  # 切换到评估模式
 # 加载完整的模型（包括结构和权重）
 
@@ -79,11 +78,14 @@ for img_path in new_verify_images_path:
         corrcet_images += 1
     predictions.append((img_name, label))
 
-    # 在图片上添加预测结果
-    #
-    # 保存带有标签的图片
-    # img_name = os.path.basename(img_path)  # 获取图片文件名
-    # img_pic.save(os.path.join(final_path, img_name))  # 保存图片到 final 文件夹
+    # 添加预测结果
+    draw = ImageDraw.Draw(img_pic)
+    font = ImageFont.truetype("arial.ttf", 50)  # 设置字体，确保字体文件路径正确
+    text = f"Predicted: {label}, True: {right_label}"
+    text_color = (0, 255, 0) if label == right_label else (255, 0, 0)  # 正确用绿色，错误用红色
+    draw.text((10, 10), text, fill=text_color, font=font)
+    
+    img_pic.save(os.path.join(output_path, img_name))  # 保存图片到 output 文件夹
 
 print("all_images:", all_images)
 print("corrcet_images:", corrcet_images)

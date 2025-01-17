@@ -1,6 +1,9 @@
+"""分类
+1.筛选验证集图片
+2.筛选训练集图片
+"""
 import os
 import shutil
-
 
 def filter_single_feature_images(input_folder, output_file):
     """筛选验证集图片并保存为New_labels格式
@@ -50,6 +53,10 @@ def filter_single_feature_images(input_folder, output_file):
     print(f"非裂缝图片数量: {non_crack_count}")
 
 
+    
+    
+
+
 def filter_val_images(labels_file, source_dir, output_dir):
     """根据Right_labels.txt筛选验证集图片
 
@@ -75,78 +82,35 @@ def filter_val_images(labels_file, source_dir, output_dir):
         dst_path = os.path.join(output_dir, image_name)
         shutil.copy2(correct_path, dst_path)
 
-
-def right_labels(Right_labels_path):
-    right_label = {}
-    with open(Right_labels_path, "r") as f:
+# 修改标签读取部分
+def right_labels(label_file):
+    label_dict = {}
+    with open(label_file, 'r') as f:
         for line in f:
-            part = line.strip().split(" ")
-            right_label[part[0]] = part[1]
+            # 确保文件名格式统一
+            img_name = line.strip().split()[0]
+            if not img_name.endswith('.jpg'):
+                img_name += '.jpg'
+            label = line.strip().split()[1]
+            label_dict[img_name] = label
+    return label_dict
 
-    return right_label
+if __name__ == "__main__":
+    input_labels_path = './val_txt'
+    new_verify_images_path = './crack-identify/Right_labels.txt'
+
+    labels_file = "./crack-identify/Right_labels.txt"
+    source_dir = "./crack-identify/verify_images"
+    output_dir = "./crack-identify/val_final_images"
+
+    filter_single_feature_images(input_labels_path, new_verify_images_path)
+    print("筛选完成")
+
+    filter_val_images(labels_file,source_dir,output_dir)
+    print("验证集筛选完成")
 
 
-input_labels_path = './val_txt'
-new_verify_images_path = './crack-identify/Right_labels.txt'
 
-labels_file = "./crack-identify/Right_labels.txt"
-source_dir = "./crack-identify/verify_images"
-output_dir = "./crack-identify/val_final_images"
-
-# filter_single_feature_images(input_labels_path, new_verify_images_path)
-# print("筛选完成")
-
-# filter_val_images(labels_file,source_dir,output_dir)
-# print("验证集筛选完成")
-
-
-def filter_single_feature_images(label_folder, source_folder, crack_folder, non_crack_folder):
-    """筛选单一特征图片并分类保存
-    crack: 只有一个特征且是0/1/2/3的图片
-    non_crack: 只有一个特征且不是0/1/2/3的图片
-
-    Args:
-        label_folder (str): 标签文件夹路径 (label_train)
-        source_folder (str): 源图片文件夹路径 (train_images)
-        crack_folder (str): 裂缝图片保存路径 (crack)
-        non_crack_folder (str): 非裂缝图片保存路径 (non_crack)
-    """
-    # 确保输出文件夹存在
-    os.makedirs(crack_folder, exist_ok=True)
-    os.makedirs(non_crack_folder, exist_ok=True)
-
-    crack_count = 0
-    non_crack_count = 0
-
-    for label_file in os.listdir(label_folder):
-        label_path = os.path.join(label_folder, label_file)
-
-        # 读取标签文件
-        with open(label_path, 'r') as f:
-            lines = f.readlines()
-
-            # 只处理单一特征的图片
-            if len(lines) == 1:
-                # 获取唯一特征
-                feature = int(lines[0].strip().split()[0])
-
-                # 构建源图片路径
-                img_name = os.path.splitext(label_file)[0] + '.jpg'
-                source_img_path = os.path.join(source_folder, img_name)
-
-                # 判断类别
-                if feature in [0, 1, 2, 3]:
-                    # 单一特征是0/1/2/3，复制到裂缝文件夹
-                    shutil.copy2(source_img_path, os.path.join(
-                        crack_folder, img_name))
-                    crack_count += 1
-                else:
-                    # 单一特征不是0/1/2/3，复制到非裂缝文件夹
-                    shutil.copy2(source_img_path, os.path.join(
-                        non_crack_folder, img_name))
-                    non_crack_count += 1
-    
-    
 # 使用示例：
 
 # label_folder = './label_train'

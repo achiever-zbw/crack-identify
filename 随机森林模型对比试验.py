@@ -1,3 +1,10 @@
+"""随机森林模型对比试验
+1.数据集划分
+2.数据预处理
+3.模型创建
+4.训练模型
+5.验证模型
+"""
 import numpy as np
 import os
 from sklearn.ensemble import RandomForestClassifier  # 导入随机森林分类器
@@ -7,6 +14,7 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 from PIL import Image
 from Classify import right_labels
+
 
 # 数据路径
 data_path = './crack-identify/Denoising_train_images'
