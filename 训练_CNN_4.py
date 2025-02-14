@@ -61,7 +61,11 @@ optimizer = optim.AdamW(
 )
 
 # 学习率调度器
-scheduler = lr_scheduler.StepLR(optimizer, step_size=40, gamma=0.3)
+scheduler = lr_scheduler.CosineAnnealingLR(
+    optimizer,
+    T_max=200,
+    eta_min=1e-5 # 保证后期有学习能力
+)
 # 记录每个 epoch 的损失
 losses = []
 # 训练模型
@@ -119,7 +123,7 @@ for each in range(num_epochs):
         f'Val Loss: {val_loss/len(val_dataloader):.4f} | Val Acc: {val_acc:.2f}%')
 
 # 保存模型
-torch.save(model.state_dict(), 'model_1.pth')
+torch.save(model.state_dict(), 'model_4.pth')
 print("模型已保存")
 
 
@@ -131,5 +135,5 @@ plt.ylabel('Loss')  # Y 轴标签
 plt.title('Training Loss over Epochs')  # 图像标题
 plt.legend()
 # 保存图像到文件
-plt.savefig('model_1.png')  # 将图像保存为 .png 文件
+plt.savefig('model_4.png')  # 将图像保存为 .png 文件
 print("损失曲线图已保存")

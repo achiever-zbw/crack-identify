@@ -5,7 +5,7 @@ import cv2
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from PIL import Image, ImageDraw, ImageFont
-from Model import CNN_4,CNN_4_new  # 导入CNN模型
+from Model import CNN_4,CNN_4_2,CNN_4_3  # 导入CNN模型
 import torch
 import torch.nn as nn 
 from Classify import right_labels
@@ -49,8 +49,8 @@ new_verify_images_path = [os.path.join(
     denoising_verify_images_path, f) for f in os.listdir(denoising_verify_images_path)]
 
 # 加载模型
-model = CNN_4_new(num_classes=2)  # 创建模型架构
-model.load_state_dict(torch.load('trained_model_CNN_4_new_对比.pth'))  # 加载权重
+model = CNN_4_2(num_classes=2)  # 创建模型架构
+model.load_state_dict(torch.load('model_5.pth'))  # 加载权重
 model.eval()  # 切换到评估模式
 # 加载完整的模型（包括结构和权重）
 

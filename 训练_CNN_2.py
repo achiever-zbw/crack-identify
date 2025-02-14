@@ -1,3 +1,15 @@
+"""道路裂缝识别项目训练
+1.划分数据集--训练与验证，防止纯背诵式记忆
+2.对数据集进行数据增强，防止过拟合（弱数据增强，强数据增强，减小数据不平衡干扰）
+3.模型创建
+4.损失函数，优化器，学习率调度器
+5.训练模型
+6.保存模型
+7.绘制损失变化图像并保存
+"""
+
+"""使用版本--基础
+    """
 import numpy as np
 import sympy as sp
 from torch.utils.data import random_split
@@ -5,22 +17,21 @@ import matplotlib.pyplot as plt
 import torch
 from torch import nn, optim
 from torch.optim import lr_scheduler
-from Model import CNN_4,CNN_4_new # CNN_4的模型导入
+from Model import CNN_4,CNN_4_2 # CNN_4的模型导入
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 from Class_Libraries import UnbalancedDataset
 import matplotlib
 matplotlib.use('TkAgg')  # 使用 TkAgg 后端
-
-
-
+# 准确率为92.88%
+# 数据集划分
 data_dir = './crack-identify/Denoising_train_images'
 full_dataset = UnbalancedDataset(data_dir=data_dir, is_train=True)
 total_size = len(full_dataset)
 train_size = int(0.9 * total_size)
 val_size = total_size - train_size
 
-# 创建验证集时使用is_train=False
+# 数据集划分
 train_dataset, val_dataset = random_split(
     full_dataset,
     [train_size, val_size],
@@ -36,9 +47,9 @@ print(f"数据集大小:")
 print(f"总数据集: {total_size}")
 print(f"训练集: {train_size}")
 print(f"验证集: {val_size}")
-# 获取类别
 
-model = CNN_4(num_classes=2)
+# 模型创建
+model = CNN_4_2(num_classes=2)
 print("模型已创建")
 # 定义损失函数和优化器
 loss_function = nn.CrossEntropyLoss()
@@ -108,7 +119,7 @@ for each in range(num_epochs):
         f'Val Loss: {val_loss/len(val_dataloader):.4f} | Val Acc: {val_acc:.2f}%')
 
 # 保存模型
-torch.save(model.state_dict(), 'trained_model_CNN_4_图片大小.pth')
+torch.save(model.state_dict(), 'model_2.pth')
 print("模型已保存")
 
 
@@ -120,5 +131,5 @@ plt.ylabel('Loss')  # Y 轴标签
 plt.title('Training Loss over Epochs')  # 图像标题
 plt.legend()
 # 保存图像到文件
-plt.savefig('2.4_图片大小.png')  # 将图像保存为 .png 文件
+plt.savefig('model_2.png')  # 将图像保存为 .png 文件
 print("损失曲线图已保存")

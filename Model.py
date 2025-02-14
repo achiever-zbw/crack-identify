@@ -87,7 +87,7 @@ class CNN_4_IC(nn.Module):
 
 class CNN_4(nn.Module):
     """4层CNN模型
-
+    基础版
     Args:
         num_classes (int): 分类数
         dropout (float): Dropout率
@@ -133,7 +133,7 @@ class CNN_4(nn.Module):
         # 调整全连接层
         self.fc_layers = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(96 * 16 * 16, 512),  # 增大维度 512->1024
+            nn.Linear(96 * 8 * 8, 512),  # 增大维度 512->1024
             nn.ReLU(),
             nn.Dropout(0.5),
             nn.Linear(512, num_classes)
@@ -147,67 +147,6 @@ class CNN_4(nn.Module):
 
         Returns:
             tensor: 输出数据
-        """
-        x = self.conv_layers(x)
-        x = self.fc_layers(x)
-        return x
-    
-class CNN_4_new(nn.Module):
-    """4层CNN模型
-
-    Args:
-        num_classes (int): 分类数
-        dropout (float): Dropout率
-        kernel_size (int): 卷积核大小
-        stride (int): 步长
-        padding (int): 填充
-    """
-
-    def __init__(self, num_classes):
-        """初始化
-        """
-        super(CNN_4_new, self).__init__()
-        self.conv_layers = nn.Sequential(
-            # 第一层 - 减少初始通道数
-            nn.Conv2d(3, 48, kernel_size=3, stride=1, padding=1),  # 48->32
-            nn.BatchNorm2d(48),
-            nn.ReLU(),
-            nn.Dropout2d(0.2),
-            nn.MaxPool2d(kernel_size=2),
-
-            # 第二层 - 平缓增长
-            nn.Conv2d(48, 96, kernel_size=3, stride=1, padding=1),  # 96->64
-            nn.BatchNorm2d(96),
-            nn.ReLU(),
-            nn.Dropout2d(0.3),
-            nn.MaxPool2d(kernel_size=2),
-
-            # 第三层 - 适度增长
-            nn.Conv2d(96, 192, kernel_size=3, stride=1, padding=1),  # 192->128
-            nn.BatchNorm2d(192),
-            nn.ReLU(),
-            nn.Dropout2d(0.4),
-            nn.MaxPool2d(kernel_size=2),
-
-            # 第四层 - 平滑收敛
-            nn.Conv2d(192, 96, kernel_size=3, stride=1, padding=1),  # 64->48
-            nn.BatchNorm2d(96),
-            nn.ReLU(),
-            nn.Dropout2d(0.3),
-            nn.MaxPool2d(kernel_size=2)
-        )
-
-        # 调整全连接层
-        self.fc_layers = nn.Sequential(
-            nn.Flatten(),
-            nn.Linear(96 * 8 * 8, 512),  # 增大维度 512->1024
-            nn.ReLU(),
-            nn.Dropout(0.4),
-            nn.Linear(512, num_classes)
-        )
-
-    def forward(self, x):
-        """前向传播
         """
         x = self.conv_layers(x)
         x = self.fc_layers(x)
@@ -230,29 +169,29 @@ class CNN_4_2(nn.Module):
         super(CNN_4_2, self).__init__()
         self.conv_layers = nn.Sequential(
             # 第一层 - 减少初始通道数
-            nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1),  # 48->32
-            nn.BatchNorm2d(64),
+            nn.Conv2d(3, 48, kernel_size=3, stride=1, padding=1),  # 48->32
+            nn.BatchNorm2d(48),
             nn.ReLU(),
-            nn.Dropout2d(0.2),
+            nn.Dropout2d(0.3),
             nn.MaxPool2d(kernel_size=2),
 
             # 第二层 - 平缓增长
-            nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),  # 96->64
-            nn.BatchNorm2d(128),
+            nn.Conv2d(48, 96, kernel_size=3, stride=1, padding=1),  # 96->64
+            nn.BatchNorm2d(96),
             nn.ReLU(),
             nn.Dropout2d(0.3),
             nn.MaxPool2d(kernel_size=2),
 
             # 第三层 - 适度增长
-            nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1),  # 192->128
-            nn.BatchNorm2d(256),
+            nn.Conv2d(96, 192, kernel_size=3, stride=1, padding=1),  # 192->128
+            nn.BatchNorm2d(192),
             nn.ReLU(),
-            nn.Dropout2d(0.6),
+            nn.Dropout2d(0.5),
             nn.MaxPool2d(kernel_size=2),
 
             # 第四层 - 平滑收敛
-            nn.Conv2d(256, 128, kernel_size=3, stride=1, padding=1),  # 64->48
-            nn.BatchNorm2d(128),
+            nn.Conv2d(192, 96, kernel_size=3, stride=1, padding=1),  # 64->48
+            nn.BatchNorm2d(96),
             nn.ReLU(),
             nn.Dropout2d(0.4),
             nn.MaxPool2d(kernel_size=2)
@@ -261,7 +200,7 @@ class CNN_4_2(nn.Module):
         # 调整全连接层
         self.fc_layers = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(128 * 16 * 16, 512),  # 增大维度 512->1024
+            nn.Linear(96 * 8 * 8, 512),  # 增大维度 512->1024
             nn.ReLU(),
             nn.Dropout(0.5),
             nn.Linear(512, num_classes)
@@ -269,12 +208,67 @@ class CNN_4_2(nn.Module):
 
     def forward(self, x):
         """前向传播
+        """
+        x = self.conv_layers(x)
+        x = self.fc_layers(x)
+        return x
 
-        Args:
-            x (tensor): 输入数据
+class CNN_4_3(nn.Module):
+    """4层CNN模型
 
-        Returns:
-            tensor: 输出数据
+    Args:
+        num_classes (int): 分类数
+        dropout (float): Dropout率
+        kernel_size (int): 卷积核大小
+        stride (int): 步长
+        padding (int): 填充
+    """
+
+    def __init__(self, num_classes):
+        """初始化
+        """
+        super(CNN_4_3, self).__init__()
+        self.conv_layers = nn.Sequential(
+            # 第一层 - 减少初始通道数
+            nn.Conv2d(3, 32, kernel_size=3, stride=1, padding=1),  # 48->32
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            #nn.Dropout2d(0.2),
+            nn.MaxPool2d(kernel_size=2),
+
+            # 第二层 - 平缓增长
+            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),  # 96->64
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.Dropout2d(0.2),
+            nn.MaxPool2d(kernel_size=2),
+
+            # 第三层 - 适度增长
+            nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),  # 192->128
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+            nn.Dropout2d(0.5),
+            nn.MaxPool2d(kernel_size=2),
+
+            # 第四层 - 平滑收敛
+            nn.Conv2d(128, 48, kernel_size=3, stride=1, padding=1),  # 64->48
+            nn.BatchNorm2d(48),
+            nn.ReLU(),
+            nn.Dropout2d(0.3),
+            nn.MaxPool2d(kernel_size=2)
+        )
+
+        # 调整全连接层
+        self.fc_layers = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(48 * 8 * 8, 64),  # 增大维度 512->1024
+            nn.ReLU(),
+            nn.Dropout(0.5),
+            nn.Linear(64, num_classes)
+        )
+
+    def forward(self, x):
+        """前向传播
         """
         x = self.conv_layers(x)
         x = self.fc_layers(x)
