@@ -5,14 +5,14 @@ import matplotlib.pyplot as plt
 import torch
 from torch import nn, optim
 from torch.optim import lr_scheduler
-from Model import CNN_4,CNN_4_new # CNN_4的模型导入
+from Model import CNN_4,CNN_4_new,CNN_4_2 # CNN_4的模型导入
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 from Class_Libraries import UnbalancedDataset
 import matplotlib
 matplotlib.use('TkAgg')  # 使用 TkAgg 后端
 
-
+# 准确率为92.81%
 
 data_dir = './crack-identify/Denoising_train_images'
 full_dataset = UnbalancedDataset(data_dir=data_dir, is_train=True)
@@ -38,14 +38,14 @@ print(f"训练集: {train_size}")
 print(f"验证集: {val_size}")
 # 获取类别
 
-model = CNN_4_new(num_classes=2)
+model = CNN_4_2(num_classes=2)
 print("模型已创建")
 # 定义损失函数和优化器
 loss_function = nn.CrossEntropyLoss()
 optimizer = optim.AdamW(
     model.parameters(),
-    lr=0.003,
-    weight_decay=0.08,
+    lr=0.004,
+    weight_decay=0.1,
     betas=(0.9, 0.999)
 )
 
@@ -112,7 +112,7 @@ for each in range(num_epochs):
         f'Val Loss: {val_loss/len(val_dataloader):.4f} | Val Acc: {val_acc:.2f}%')
 
 # 保存模型
-torch.save(model.state_dict(), 'trained_model_CNN_4_new.pth')
+torch.save(model.state_dict(), 'trained_model_CNN_4_对比大小.pth')
 print("模型已保存")
 
 
@@ -124,5 +124,5 @@ plt.ylabel('Loss')  # Y 轴标签
 plt.title('Training Loss over Epochs')  # 图像标题
 plt.legend()
 # 保存图像到文件
-plt.savefig('1.16_CNN_4_new.png')  # 将图像保存为 .png 文件
+plt.savefig('2.4_对比.png')  # 将图像保存为 .png 文件
 print("损失曲线图已保存")

@@ -17,7 +17,7 @@ matplotlib.use('TkAgg')  # 使用 TkAgg 后端
 data_dir = './crack-identify/Denoising_train_images'
 full_dataset = UnbalancedDataset(data_dir=data_dir, is_train=True)
 total_size = len(full_dataset)
-train_size = int(0.85 * total_size)
+train_size = int(0.9 * total_size)
 val_size = total_size - train_size
 
 # 创建验证集时使用is_train=False
@@ -108,7 +108,7 @@ for each in range(num_epochs):
         f'Val Loss: {val_loss/len(val_dataloader):.4f} | Val Acc: {val_acc:.2f}%')
 
 # 保存模型
-torch.save(model.state_dict(), 'trained_model_CNN_4_对比.pth')
+torch.save(model.state_dict(), 'trained_model_CNN_4_图片大小.pth')
 print("模型已保存")
 
 
@@ -120,5 +120,5 @@ plt.ylabel('Loss')  # Y 轴标签
 plt.title('Training Loss over Epochs')  # 图像标题
 plt.legend()
 # 保存图像到文件
-plt.savefig('1.16_CNN_4_对比.png')  # 将图像保存为 .png 文件
+plt.savefig('2.4_图片大小.png')  # 将图像保存为 .png 文件
 print("损失曲线图已保存")

@@ -20,7 +20,7 @@ from torchvision import datasets, transforms
 from Class_Libraries import UnbalancedDataset
 import matplotlib
 matplotlib.use('TkAgg')  # 使用 TkAgg 后端
-
+# 准确率为92.88%
 # 数据集划分
 data_dir = './crack-identify/Denoising_train_images'
 full_dataset = UnbalancedDataset(data_dir=data_dir, is_train=True)

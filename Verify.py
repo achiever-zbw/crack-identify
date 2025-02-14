@@ -9,7 +9,7 @@ from Model import CNN_4,CNN_4_new  # 导入CNN模型
 import torch
 import torch.nn as nn 
 from Classify import right_labels
-from Class_Libraries import Detector
+
 
 # 定义计算损失和返回输出的函数
 def model_out_loss(input_data, model):
@@ -50,7 +50,7 @@ new_verify_images_path = [os.path.join(
 
 # 加载模型
 model = CNN_4_new(num_classes=2)  # 创建模型架构
-model.load_state_dict(torch.load('trained_model_CNN_4_对比.pth'))  # 加载权重
+model.load_state_dict(torch.load('trained_model_CNN_4_new_对比.pth'))  # 加载权重
 model.eval()  # 切换到评估模式
 # 加载完整的模型（包括结构和权重）
 

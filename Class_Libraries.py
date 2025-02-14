@@ -32,7 +32,7 @@ class UnbalancedDataset(Dataset):
         
         # 对少量数据进行数据增强
         self.strong_transform=transforms.Compose([
-            transforms.Resize([128, 128]),  # 输入调整为128x128
+            transforms.Resize([256, 256]),  # 输入调整为128x128
             transforms.RandomRotation(degrees=15),  # 随机旋转
             transforms.RandomHorizontalFlip(),  # 水平翻转
             transforms.RandomVerticalFlip(),  # 垂直翻转
@@ -49,7 +49,7 @@ class UnbalancedDataset(Dataset):
         ])
     
         self.weak_transform=transforms.Compose([
-            transforms.Resize([128, 128]),  # 输入调整为128x128
+            transforms.Resize([256, 256]),  # 输入调整为128x128
             transforms.RandomRotation(degrees=15),  # 随机旋转
             transforms.RandomHorizontalFlip(),  # 水平翻转
             transforms.ToTensor(),
@@ -59,7 +59,7 @@ class UnbalancedDataset(Dataset):
         ])
         
         self.val_transform = transforms.Compose([
-            transforms.Resize([128, 128]),
+            transforms.Resize([256, 256]),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], 
                                std=[0.229, 0.224, 0.225])
